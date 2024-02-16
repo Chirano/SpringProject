@@ -31,9 +31,6 @@ public class VehicleService {
         Vehicle vehicle = vehicleRepository.save(new Vehicle(vehicleDTO.getVIN(), vehicleDTO.getModelId(), vehicleDTO.getSellerId(), vehicleDTO.getReleaseYear(),
                                 vehicleDTO.getPrice(), vehicleDTO.getFuel(), vehicleDTO.getKilometers(), vehicleDTO. getColor(),
                                 vehicleDTO.getGear()));
-
-        if(vehicle == null){return null;}
-
         return vehicle;
     }
 
@@ -41,7 +38,8 @@ public class VehicleService {
         Vehicle vehicle = vehicleRepository.findById(VIN).get();
         if(vehicle == null){
             return null;}
-        vehicleDTO.setVIN(vehicle.getVIN());
+
+        vehicleDTO.setVIN(VIN);
         Vehicle ve =vehicleRepository.save(new Vehicle(vehicleDTO.getVIN(), vehicleDTO.getModelId(), vehicleDTO.getSellerId(), vehicleDTO.getReleaseYear(),
                 vehicleDTO.getPrice(), vehicleDTO.getFuel(), vehicleDTO.getKilometers(), vehicleDTO. getColor(),
                 vehicleDTO.getGear()));

@@ -9,6 +9,7 @@ public class ModelDTO extends RepresentationModel<ModelDTO> {
 
     private Integer brandId;
 
+
     public ModelDTO(long id, String name, int brandId) {
         this.id = id;
         this.name = name;

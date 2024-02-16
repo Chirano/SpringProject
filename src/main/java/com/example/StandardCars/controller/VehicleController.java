@@ -36,6 +36,7 @@ public class VehicleController {
             vehicleDTO.add(linkTo(methodOn(VehicleController.class).getVehicle(vehicleDTO.getVIN())).withSelfRel());
             vehiclesDTO.add(vehicleDTO);
         }
+
         Link link = linkTo(methodOn(VehicleController.class).getVehicles()).withSelfRel();
         CollectionModel<VehicleDTO> resp = CollectionModel.of(vehiclesDTO, link);
 

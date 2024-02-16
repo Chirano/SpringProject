@@ -1,28 +1,27 @@
-package com.example.StandardCars.model;
-import jakarta.persistence.*;
+package com.example.StandardCars.dto;
+
+import com.example.StandardCars.model.Seller;
+import com.example.StandardCars.model.Vehicle;
+import jakarta.persistence.Id;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-public class Seller {
+public class SellerDTO extends RepresentationModel<SellerDTO> {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private long Id;
 
     private String name;
 
-
     private String email;
-
 
     private String phoneNumber;
 
-    @OneToMany
-    private List<Vehicle> vehicles;
+    private ArrayList<Vehicle> vehicles;
 
-
-    public Seller(long id, String name, String email, String phoneNumber) {
+    public SellerDTO(long id, String name, String email, String phoneNumber) {
         Id = id;
         this.name = name;
         this.email = email;
@@ -30,8 +29,7 @@ public class Seller {
         this.vehicles = new ArrayList<>();
     }
 
-
-    public Seller() {
+    public SellerDTO() {
         Id = 0;
         this.name = " ";
         this.email = " ";
@@ -39,7 +37,9 @@ public class Seller {
         this.vehicles = new ArrayList<>();
     }
 
-    public long getId() {  return Id;   }
+    public long getId() {
+        return Id;
+    }
 
     public String getName() {
         return name;
@@ -54,6 +54,9 @@ public class Seller {
     }
 
     public List<Vehicle> getVehicles() { return this.vehicles; }
+
+    public void setId(long id) { this.Id = id; }
+
     public void setName(String name) {
         this.name = name;
     }
