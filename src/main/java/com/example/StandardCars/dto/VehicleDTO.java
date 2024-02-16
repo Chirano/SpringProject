@@ -16,6 +16,7 @@ public class VehicleDTO extends RepresentationModel<VehicleDTO> {
 
     public VehicleDTO(String VIN, String model, String seller, Integer releaseYear, double price,
                    String fuel, long kilometers, String color, String gear) {
+
         this.VIN = VIN;
         this.model = model;
         this.seller = seller;

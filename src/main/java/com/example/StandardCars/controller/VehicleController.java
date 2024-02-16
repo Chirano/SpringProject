@@ -32,7 +32,8 @@ public class VehicleController {
         List<VehicleDTO> vehiclesDTO = new ArrayList<>();
 
         for(Vehicle vehicle : vehicles){
-            VehicleDTO vehicleDTO = new VehicleDTO(vehicle.getVIN(), new ModelDTO(vehicle.getModel()), new SellerDTO(vehicle.getSeller()), vehicle.getReleaseYear(),
+            VehicleDTO vehicleDTO = new VehicleDTO(vehicle.getVIN(), vehicle.getModel().getName(),
+                    vehicle.getSeller().getName(), vehicle.getReleaseYear(),
                     vehicle.getPrice(), vehicle.getFuel(), vehicle.getKilometers(), vehicle. getColor(),
                     vehicle.getGear());
             vehicleDTO.add(linkTo(methodOn(VehicleController.class).getVehicle(vehicleDTO.getVIN())).withSelfRel());
@@ -56,8 +57,8 @@ public class VehicleController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        VehicleDTO vehicleDTO = new VehicleDTO(vehicle.getVIN(), new ModelDTO(vehicle.getModel()),
-                new SellerDTO(vehicle.getSeller()), vehicle.getReleaseYear(),
+        VehicleDTO vehicleDTO = new VehicleDTO(vehicle.getVIN(),vehicle.getModel().getName(),
+                vehicle.getSeller().getName(), vehicle.getReleaseYear(),
                 vehicle.getPrice(), vehicle.getFuel(), vehicle.getKilometers(), vehicle. getColor(),
                 vehicle.getGear());
 
@@ -75,9 +76,9 @@ public class VehicleController {
 
 
 
-        VehicleDTO veDTO = new VehicleDTO(vehicle.getVIN(), new ModelDTO(vehicle.getModel()),
-                new SellerDTO(vehicle.getSeller()), vehicle.getReleaseYear(), vehicle.getPrice(), vehicle.getFuel(),
-                vehicle.getKilometers(), vehicle. getColor(), vehicle.getGear());
+        VehicleDTO veDTO = new VehicleDTO(vehicle.getVIN(),vehicle.getModel().getName(),
+                vehicle.getSeller().getName(), vehicle.getReleaseYear(), vehicle.getPrice(),
+                vehicle.getFuel(), vehicle.getKilometers(), vehicle. getColor(), vehicle.getGear());
 
         veDTO.add(linkTo(methodOn(VehicleController.class).getVehicles()).withRel("all_vehicles"));
         veDTO.add(linkTo(methodOn(VehicleController.class).getVehicle(vehicleDTO.getVIN())).withRel("vehicle_by_VIN"));
@@ -89,7 +90,8 @@ public class VehicleController {
 
 
     @PutMapping(value ="/vehicle/{VIN}", consumes = "application/json", produces = "application/json")
-    ResponseEntity<VehicleDTO> updateVehicle(@PathVariable("VIN") String VIN, @RequestBody VehicleDTO vehicleDTO) {
+    ResponseEntity<VehicleDTO> updateVehicle(@PathVariable("VIN") String VIN,
+                                             @RequestBody VehicleDTO vehicleDTO) {
         if(vehicleDTO == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -100,8 +102,9 @@ public class VehicleController {
 
         Vehicle vehicle = service.updateVehicle(VIN, vehicleDTO);
 
-        VehicleDTO upVehicleDTO = new VehicleDTO(vehicle.getVIN(), new ModelDTO(vehicle.getModel()),
-                new SellerDTO(vehicle.getSeller()), vehicle.getReleaseYear(), vehicle.getPrice(), vehicle.getFuel(),
+        VehicleDTO upVehicleDTO = new VehicleDTO(vehicle.getVIN(),vehicle.getModel().getName(),
+                vehicle.getSeller().getName(), vehicle.getReleaseYear(), vehicle.getPrice(),
+                vehicle.getFuel(),
                 vehicle.getKilometers(), vehicle. getColor(), vehicle.getGear());
 
         return new ResponseEntity<>(upVehicleDTO, HttpStatus.OK);
@@ -116,8 +119,8 @@ public class VehicleController {
 
         Vehicle vehicle = service.deleteVehicleByVIN(VIN);
 
-        VehicleDTO vehicleDTO = new VehicleDTO(vehicle.getVIN(), new ModelDTO(vehicle.getModel()),
-                new SellerDTO(vehicle.getSeller()), vehicle.getReleaseYear(), vehicle.getPrice(),
+        VehicleDTO vehicleDTO = new VehicleDTO(vehicle.getVIN(),vehicle.getModel().getName(),
+                vehicle.getSeller().getName(), vehicle.getReleaseYear(), vehicle.getPrice(),
                 vehicle.getFuel(), vehicle.getKilometers(), vehicle. getColor(), vehicle.getGear());
 
         return new ResponseEntity<>(vehicleDTO, HttpStatus.OK);
