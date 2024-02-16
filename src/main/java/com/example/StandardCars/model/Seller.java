@@ -1,4 +1,5 @@
 package com.example.StandardCars.model;
+import com.example.StandardCars.dto.SellerDTO;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -32,13 +33,20 @@ public class Seller {
 
 
     public Seller() {
-        Id = 0;
+        this.Id = 0;
         this.name = " ";
         this.email = " ";
         this.phoneNumber = " ";
         this.vehicles = new ArrayList<>();
     }
 
+    public Seller(SellerDTO sellerDTO){
+        this.Id = sellerDTO.getId();
+        this.name = sellerDTO.getName();
+        this.email = sellerDTO.getEmail();
+        this.phoneNumber = sellerDTO.getPhoneNumber();
+        this.vehicles = new ArrayList<>();
+    }
     public long getId() {  return Id;   }
 
     public String getName() {

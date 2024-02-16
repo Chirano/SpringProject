@@ -4,8 +4,8 @@ import org.springframework.hateoas.RepresentationModel;
 
 public class VehicleDTO extends RepresentationModel<VehicleDTO> {
     private String VIN;
-    private long modelId;
-    private long sellerId;
+    private String model;
+    private String seller;
     private Integer releaseYear;
     private double price;
     private String fuel;
@@ -14,11 +14,11 @@ public class VehicleDTO extends RepresentationModel<VehicleDTO> {
     private String gear;
 
 
-    public VehicleDTO(String VIN, long modelId, long sellerId, Integer releaseYear, double price,
+    public VehicleDTO(String VIN, String model, String seller, Integer releaseYear, double price,
                    String fuel, long kilometers, String color, String gear) {
         this.VIN = VIN;
-        this.modelId = modelId;
-        this.sellerId = sellerId;
+        this.model = model;
+        this.seller = seller;
         this.releaseYear = releaseYear;
         this.price = price;
         this.fuel = fuel;
@@ -30,8 +30,8 @@ public class VehicleDTO extends RepresentationModel<VehicleDTO> {
 
     public VehicleDTO() {
         this.VIN = "";
-        this.modelId = 0;
-        this.sellerId = 0;
+        this.model = "";
+        this.seller = "";
         this.releaseYear = 0;
         this.fuel = "";
         this.kilometers = 0;
@@ -39,16 +39,16 @@ public class VehicleDTO extends RepresentationModel<VehicleDTO> {
         this.gear = "";
     }
 
-    public long getSellerId() {
-        return sellerId;
+    public String getSeller() {
+        return seller;
     }
 
     public String getVIN() {
         return VIN;
     }
 
-    public long getModelId() {
-        return modelId;
+    public String getModel() {
+        return model;
     }
 
     public int getReleaseYear() {
@@ -79,8 +79,8 @@ public class VehicleDTO extends RepresentationModel<VehicleDTO> {
         this.VIN = VIN;
     }
 
-    public void setModelId(int modelId) {
-        this.modelId = modelId;
+    public void setModelId(String model) {
+        this.model = model;
     }
 
     public void setReleaseYear(int year) {
@@ -95,8 +95,8 @@ public class VehicleDTO extends RepresentationModel<VehicleDTO> {
         this.fuel = fuel;
     }
 
-    public void setSellerId(Integer sellerId) {
-        this.sellerId = sellerId;
+    public void setSeller(String seller) {
+        this.seller = seller;
     }
 
     public void setKilometers(long kilometers) {

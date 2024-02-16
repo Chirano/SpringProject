@@ -37,6 +37,13 @@ public class SellerDTO extends RepresentationModel<SellerDTO> {
         this.vehicles = new ArrayList<>();
     }
 
+    public SellerDTO(Seller seller) {
+        this.Id = seller.getId();
+        this.name = seller.getName();
+        this.email = seller.getEmail();
+        this.phoneNumber = seller.getPhoneNumber();
+        this.vehicles = new ArrayList<>();
+    }
     public long getId() {
         return Id;
     }

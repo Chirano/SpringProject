@@ -1,5 +1,6 @@
 package com.example.StandardCars.dto;
 
+import com.example.StandardCars.model.Model;
 import org.springframework.hateoas.RepresentationModel;
 
 public class ModelDTO extends RepresentationModel<ModelDTO> {
@@ -7,20 +8,26 @@ public class ModelDTO extends RepresentationModel<ModelDTO> {
 
     private String name;
 
-    private Integer brandId;
+    private BrandDTO brand;
 
 
-    public ModelDTO(long id, String name, int brandId) {
+    public ModelDTO(long id, String name, BrandDTO brand) {
         this.id = id;
         this.name = name;
-        this.brandId = brandId;
+        this.brand = brand;
     }
 
     public ModelDTO() {
         this.id = 0;
         this.name = "";
-        this.brandId = 0;
+        this.brand = new BrandDTO();
 
+    }
+
+    public ModelDTO(Model model) {
+        this.id = model.getId();
+        this.name = model.getName();
+        this.brand = new BrandDTO(model.getBrand());
     }
 
     public long getId() {
@@ -31,16 +38,16 @@ public class ModelDTO extends RepresentationModel<ModelDTO> {
         return name;
     }
 
-    public int getBrandId() {
-        return brandId;
+    public BrandDTO getBrand() {
+        return brand;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public void setBrand(int brand) {
-        this.brandId = brand;
+    public void setBrand(BrandDTO brand) {
+        this.brand = brand;
     }
 
     public void setId(long id) {

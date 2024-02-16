@@ -12,15 +12,17 @@ public class Vehicle {
     private long kilometers;
     private String color;
     private String gear;
-    private long modelId;
-    private long sellerId;
+    @ManyToOne
+    private Model model;
+    @ManyToOne
+    private Seller seller;
 
 
-    public Vehicle(String VIN, long modelId, long sellerId, Integer releaseYear, double price,
+    public Vehicle(String VIN, Model model, Seller seller, Integer releaseYear, double price,
                    String fuel, long kilometers, String color, String gear) {
         this.VIN = VIN;
-        this.modelId = modelId;
-        this.sellerId = sellerId;
+        this.model = model;
+        this.seller = seller;
         this.releaseYear = releaseYear;
         this.price = price;
         this.fuel = fuel;
@@ -32,8 +34,8 @@ public class Vehicle {
 
     public Vehicle() {
         this.VIN = "";
-        this.modelId = 0;
-        this.sellerId = 0;
+        this.model = new Model();
+        this.seller = new Seller();
         this.releaseYear = 0;
         this.fuel = "";
         this.kilometers = 0;
@@ -41,16 +43,16 @@ public class Vehicle {
         this.gear = "";
     }
 
-    public long getSellerId() {
-        return sellerId;
+    public Seller getSeller() {
+        return seller;
     }
 
     public String getVIN() {
         return VIN;
     }
 
-    public long getModelId() {
-        return modelId;
+    public Model getModel() {
+        return model;
     }
 
     public int getReleaseYear() {
@@ -77,8 +79,8 @@ public class Vehicle {
         return gear;
     }
 
-    public void setModelId(int modelId) {
-        this.modelId = modelId;
+    public void setModelId(Model model) {
+        this.model = model;
     }
 
     public void setReleaseYear(int year) {
@@ -93,8 +95,8 @@ public class Vehicle {
         this.fuel = fuel;
     }
 
-    public void setSellerId(Integer sellerId) {
-        this.sellerId = sellerId;
+    public void setSeller(Seller seller) {
+        this.seller = seller;
     }
 
     public void setKilometers(long kilometers) {

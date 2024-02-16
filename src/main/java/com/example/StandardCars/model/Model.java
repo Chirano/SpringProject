@@ -1,9 +1,10 @@
 package com.example.StandardCars.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.example.StandardCars.dto.ModelDTO;
+import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Model {
@@ -12,20 +13,31 @@ public class Model {
     public long id;
 
     private String name;
+    @ManyToOne
+    private Brand brand;
+    @OneToMany
+    private List<Vehicle> vehicles;
 
-    private Integer brandId;
-
-    public Model(long id, String name, int brandId) {
+    public Model(long id, String name, Brand brand) {
         this.id = id;
         this.name = name;
-        this.brandId = brandId;
+        this.brand = brand;
+        this.vehicles = new ArrayList<>();
     }
 
     public Model() {
         this.id = 0;
         this.name = "";
-        this.brandId = 0;
+        this.brand = new Brand();
+        this.vehicles = new ArrayList<>();
 
+    }
+
+    public Model(ModelDTO modelDTO){
+        this.id = modelDTO.getId();
+        this.name = modelDTO.getName();
+        this.brand = new Brand(modelDTO.getBrand());
+        this.vehicles = new ArrayList<>();
     }
 
     public long getId() {
@@ -36,16 +48,18 @@ public class Model {
         return name;
     }
 
-    public int getBrandId() {
-        return brandId;
+    public Brand getBrand() {
+        return brand;
     }
+
+    public List<Vehicle> getVehicles(){ return vehicles;}
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public void setBrand(int brand) {
-        this.brandId = brand;
+    public void setBrand(Brand brand) {
+        this.brand = brand;
     }
 
 }
