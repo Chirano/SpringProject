@@ -8,8 +8,6 @@ import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +45,7 @@ public class SellerController {
 
     @GetMapping("/seller/{id}")
     public ResponseEntity<SellerDTO> getSeller(@PathVariable("id") long id) {
+
         Seller seller = service.getSellerById(id);
 
         if(seller == null){
@@ -82,10 +81,16 @@ public class SellerController {
 
     @PutMapping(value ="/seller/{id}", consumes = "application/json", produces = "application/json")
     ResponseEntity<SellerDTO> updateSeller(@PathVariable("id") long id, @RequestBody SellerDTO sellerDTO) {
-        Seller seller = service.updateSeller(id, sellerDTO);
-        if(seller == null){
+        if(sellerDTO == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+
+        if(service.getSellerById(id) == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+
+        Seller seller = service.updateSeller(id, sellerDTO);
 
         SellerDTO seDTO = new SellerDTO(seller.getId(), seller.getName(),
                 seller.getPhoneNumber(), seller.getEmail());
@@ -96,18 +101,15 @@ public class SellerController {
 
     @DeleteMapping(value = "/seller/{id}", produces =  "application/json")
     ResponseEntity<SellerDTO> deleteSeller(@PathVariable("id") long id) {
-        Seller seller = service.deleteSeller(id);
-
-        if(seller == null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if(service.getSellerById(id) == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
+        Seller seller = service.deleteSeller(id);
 
         SellerDTO seDTO = new SellerDTO(seller.getId(), seller.getName(),
                 seller.getPhoneNumber(), seller.getEmail());
 
         return new ResponseEntity<>(seDTO, HttpStatus.OK);
     }
-
-
-
 }

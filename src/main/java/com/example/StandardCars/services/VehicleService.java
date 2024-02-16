@@ -51,7 +51,8 @@ public class VehicleService {
         if(vehicle == null){
             return null;
         }
-        this.vehicleRepository.deleteById(VIN);
+
+        vehicleRepository.deleteById(VIN);
         return vehicle;
     }
 }

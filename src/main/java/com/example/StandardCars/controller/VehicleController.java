@@ -64,11 +64,11 @@ public class VehicleController {
 
     @PostMapping(value = "/vehicle", consumes = "application/json", produces = "application/json")
     public ResponseEntity<VehicleDTO> addVehicle(@RequestBody VehicleDTO vehicleDTO) {
-        Vehicle vehicle = service.addVehicle(vehicleDTO);
-
-        if(vehicle == null){
+        if(vehicleDTO == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+
+        Vehicle vehicle = service.addVehicle(vehicleDTO);
 
         VehicleDTO veDTO = new VehicleDTO(vehicle.getVIN(), vehicle.getModelId(), vehicle.getSellerId(), vehicle.getReleaseYear(),
                 vehicle.getPrice(), vehicle.getFuel(), vehicle.getKilometers(), vehicle. getColor(),
@@ -84,10 +84,16 @@ public class VehicleController {
 
     @PutMapping(value ="/vehicle/{VIN}", consumes = "application/json", produces = "application/json")
     ResponseEntity<VehicleDTO> updateVehicle(@PathVariable("VIN") String VIN, @RequestBody VehicleDTO vehicleDTO) {
-        Vehicle vehicle = service.updateVehicle(VIN, vehicleDTO);
-        if(vehicle == null){
+        if(vehicleDTO == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+
+        if(service.getVehicleByVIN(VIN) == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        Vehicle vehicle = service.updateVehicle(VIN, vehicleDTO);
+
         VehicleDTO upVehicleDTO = new VehicleDTO(vehicle.getVIN(), vehicle.getModelId(), vehicle.getSellerId(), vehicle.getReleaseYear(),
                 vehicle.getPrice(), vehicle.getFuel(), vehicle.getKilometers(), vehicle. getColor(),
                 vehicle.getGear());
@@ -98,11 +104,11 @@ public class VehicleController {
 
     @DeleteMapping(value = "/vehicle/{VIN}", produces =  "application/json")
     ResponseEntity<VehicleDTO> deleteVehicle(@PathVariable("VIN") String VIN) {
-        Vehicle vehicle = service.deleteVehicleByVIN(VIN);
-
-        if(vehicle == null){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if(service.getVehicleByVIN(VIN) == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
+        Vehicle vehicle = service.deleteVehicleByVIN(VIN);
 
         VehicleDTO vehicleDTO = new VehicleDTO(vehicle.getVIN(), vehicle.getModelId(), vehicle.getSellerId(), vehicle.getReleaseYear(),
                 vehicle.getPrice(), vehicle.getFuel(), vehicle.getKilometers(), vehicle. getColor(),
