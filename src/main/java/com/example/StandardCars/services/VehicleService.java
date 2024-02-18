@@ -40,9 +40,9 @@ public class VehicleService {
          Model model = getModel(vehicleDTO.getModel());
          Seller seller = getSeller(vehicleDTO.getSeller());
 
-        return vehicleRepository.save(new Vehicle(vehicleDTO.getVIN(), model,
-                seller, vehicleDTO.getReleaseYear(), vehicleDTO.getPrice(),
-                vehicleDTO.getFuel(), vehicleDTO.getKilometers(), vehicleDTO. getColor(), vehicleDTO.getGear()));
+        return vehicleRepository.save(new Vehicle(vehicleDTO.getVIN(), vehicleDTO.getReleaseYear(),
+                vehicleDTO.getPrice(), vehicleDTO.getFuel(), vehicleDTO.getKilometers(), vehicleDTO. getColor(),
+                vehicleDTO.getGear(), vehicleDTO.getStatus(),  model, seller));
     }
 
     public Vehicle updateVehicle(String VIN, VehicleDTO vehicleDTO){
@@ -56,9 +56,9 @@ public class VehicleService {
         Model model = getModel(vehicleDTO.getModel());
         Seller seller = getSeller(vehicleDTO.getSeller());
 
-        Vehicle ve = vehicleRepository.save(new Vehicle(vehicleDTO.getVIN(), model, seller,
-                vehicleDTO.getReleaseYear(), vehicleDTO.getPrice(), vehicleDTO.getFuel(),
-                vehicleDTO.getKilometers(), vehicleDTO. getColor(), vehicleDTO.getGear()));
+        Vehicle ve = vehicleRepository.save(new Vehicle(vehicleDTO.getVIN(), vehicleDTO.getReleaseYear(),
+                vehicleDTO.getPrice(), vehicleDTO.getFuel(), vehicleDTO.getKilometers(), vehicleDTO. getColor(),
+                vehicleDTO.getGear(), vehicleDTO.getStatus(),  model, seller));
         return ve;
     }
 

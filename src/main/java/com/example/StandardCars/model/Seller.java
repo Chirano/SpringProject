@@ -19,6 +19,7 @@ public class Seller {
 
     private String phoneNumber;
 
+
     @OneToMany
     private List<Vehicle> vehicles;
 
@@ -47,28 +48,37 @@ public class Seller {
         this.phoneNumber = sellerDTO.getPhoneNumber();
         this.vehicles = new ArrayList<>();
     }
+
     public long getId() {  return Id;   }
+
 
     public String getName() {
         return name;
     }
 
+
     public String getEmail() {
         return email;
     }
+
 
     public String getPhoneNumber() {
         return phoneNumber;
     }
 
+
     public List<Vehicle> getVehicles() { return this.vehicles; }
+
+
     public void setName(String name) {
         this.name = name;
     }
 
+
     public void setEmail(String email) {
         this.email = email;
     }
+
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;

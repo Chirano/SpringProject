@@ -8,10 +8,10 @@ public class ModelDTO extends RepresentationModel<ModelDTO> {
 
     private String name;
 
-    private BrandDTO brand;
+    private String brand;
 
 
-    public ModelDTO(long id, String name, BrandDTO brand) {
+    public ModelDTO(long id, String name, String brand) {
         this.id = id;
         this.name = name;
         this.brand = brand;
@@ -20,14 +20,14 @@ public class ModelDTO extends RepresentationModel<ModelDTO> {
     public ModelDTO() {
         this.id = 0;
         this.name = "";
-        this.brand = new BrandDTO();
+        this.brand = "";
 
     }
 
     public ModelDTO(Model model) {
         this.id = model.getId();
         this.name = model.getName();
-        this.brand = new BrandDTO(model.getBrand());
+        this.brand = model.getBrand().getName();
     }
 
     public long getId() {
@@ -38,7 +38,7 @@ public class ModelDTO extends RepresentationModel<ModelDTO> {
         return name;
     }
 
-    public BrandDTO getBrand() {
+    public String getBrand() {
         return brand;
     }
 
@@ -46,7 +46,7 @@ public class ModelDTO extends RepresentationModel<ModelDTO> {
         this.name = name;
     }
 
-    public void setBrand(BrandDTO brand) {
+    public void setBrand(String brand) {
         this.brand = brand;
     }
 

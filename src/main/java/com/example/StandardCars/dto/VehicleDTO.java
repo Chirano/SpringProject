@@ -1,43 +1,46 @@
 package com.example.StandardCars.dto;
 
+import com.example.StandardCars.Enums.Status;
 import org.springframework.hateoas.RepresentationModel;
 
 public class VehicleDTO extends RepresentationModel<VehicleDTO> {
     private String VIN;
-    private String model;
-    private String seller;
     private Integer releaseYear;
     private double price;
     private String fuel;
     private long kilometers;
     private String color;
     private String gear;
+    private Status status;
+    private String model;
+    private String seller;
 
 
-    public VehicleDTO(String VIN, String model, String seller, Integer releaseYear, double price,
-                   String fuel, long kilometers, String color, String gear) {
+    public VehicleDTO(String VIN, Integer releaseYear, double price, String fuel, long kilometers,
+                      String color, String gear, Status status, String model, String seller) {
 
         this.VIN = VIN;
-        this.model = model;
-        this.seller = seller;
         this.releaseYear = releaseYear;
         this.price = price;
         this.fuel = fuel;
         this.kilometers = kilometers;
         this.color = color;
         this.gear = gear;
-
+        this.status = status;
+        this.model = model;
+        this.seller = seller;
     }
 
     public VehicleDTO() {
         this.VIN = "";
-        this.model = "";
-        this.seller = "";
         this.releaseYear = 0;
         this.fuel = "";
         this.kilometers = 0;
         this.color = "";
         this.gear = "";
+        this.status = Status.Available;
+        this.model = "";
+        this.seller = "";
     }
 
     public String getSeller() {
@@ -76,6 +79,8 @@ public class VehicleDTO extends RepresentationModel<VehicleDTO> {
         return gear;
     }
 
+    public Status getStatus() { return status; }
+
     public void setVIN(String VIN) {
         this.VIN = VIN;
     }
@@ -111,4 +116,6 @@ public class VehicleDTO extends RepresentationModel<VehicleDTO> {
     public void setGear(String gear) {
         this.gear = gear;
     }
+
+    public void setStatus(Status status) {  this.status = status; }
 }
