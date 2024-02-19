@@ -1,5 +1,5 @@
 package com.example.StandardCars.services;
-
+import com.example.StandardCars.Enums.Status;
 import com.example.StandardCars.Repository.ModelRepository;
 import com.example.StandardCars.Repository.SellerRepository;
 import com.example.StandardCars.Repository.VehicleRepository;
@@ -37,12 +37,14 @@ public class VehicleService {
     }
 
     public Vehicle addVehicle(VehicleDTO vehicleDTO){
+
          Model model = getModel(vehicleDTO.getModel());
          Seller seller = getSeller(vehicleDTO.getSeller());
 
-        return vehicleRepository.save(new Vehicle(vehicleDTO.getVIN(), vehicleDTO.getReleaseYear(),
-                vehicleDTO.getPrice(), vehicleDTO.getFuel(), vehicleDTO.getKilometers(), vehicleDTO. getColor(),
-                vehicleDTO.getGear(), vehicleDTO.getStatus(),  model, seller));
+        return vehicleRepository.save(new Vehicle(vehicleDTO.getVIN(), vehicleDTO.getReleaseYear(), vehicleDTO.getPrice(),
+                                    vehicleDTO.getFuel(), vehicleDTO.getKilometers(),  vehicleDTO.getColor(),
+                                    vehicleDTO.getGear(), vehicleDTO.getStatus(), vehicleDTO.getBuyerId(),
+                                    vehicleDTO.getTransactionId(), model, seller));
     }
 
     public Vehicle updateVehicle(String VIN, VehicleDTO vehicleDTO){
@@ -56,9 +58,10 @@ public class VehicleService {
         Model model = getModel(vehicleDTO.getModel());
         Seller seller = getSeller(vehicleDTO.getSeller());
 
-        Vehicle ve = vehicleRepository.save(new Vehicle(vehicleDTO.getVIN(), vehicleDTO.getReleaseYear(),
-                vehicleDTO.getPrice(), vehicleDTO.getFuel(), vehicleDTO.getKilometers(), vehicleDTO. getColor(),
-                vehicleDTO.getGear(), vehicleDTO.getStatus(),  model, seller));
+        Vehicle ve = vehicleRepository.save(new Vehicle(vehicleDTO.getVIN(), vehicleDTO.getReleaseYear(), vehicleDTO.getPrice(),
+                vehicleDTO.getFuel(), vehicleDTO.getKilometers(),  vehicleDTO.getColor(),
+                vehicleDTO.getGear(), vehicleDTO.getStatus(), vehicleDTO.getBuyerId(),
+                vehicleDTO.getTransactionId(), model, seller));
         return ve;
     }
 
@@ -71,6 +74,41 @@ public class VehicleService {
         vehicleRepository.deleteById(VIN);
         return vehicle;
     }
+
+    public Vehicle updateVehicleStatus(String VIN, String status){
+        Vehicle vehicle = vehicleRepository.findById(VIN).get();
+
+
+        Status newStatus = Status.valueOf(status);
+        vehicle.setStatus(newStatus);
+        Vehicle upVehicle = vehicleRepository.save(vehicle);
+
+        return upVehicle;
+    }
+
+    public List<Vehicle> getVehicleByModel(String modelName){
+        Model model =  modelRepository.findModelByName(modelName);
+        if(model == null){
+            return null;
+        }
+
+        List<Vehicle> vehicles = vehicleRepository.findVehicleByModel(model);
+
+        return vehicles;
+    }
+    public List<Vehicle> getVehicleBySeller(long id){
+        Seller seller =  sellerRepository.findById(id).orElse(null);
+
+        if(seller == null){
+            return null;
+        }
+
+        List<Vehicle> vehicles = vehicleRepository.findVehicleBySeller(seller);
+
+        return vehicles;
+    }
+
+
 
     public Model getModel(String modelName){
         return modelRepository.findModelByName(modelName);

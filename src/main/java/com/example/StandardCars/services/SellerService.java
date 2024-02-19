@@ -32,7 +32,6 @@ public class SellerService {
         return newSeller;
    }
 
-
    public Seller updateSeller(long id, SellerDTO sellerDTO){
        Seller seller = repository.findById(id).get();
 

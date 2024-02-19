@@ -1,5 +1,6 @@
 package com.example.StandardCars.model;
 import com.example.StandardCars.Enums.Status;
+import com.example.StandardCars.dto.VehicleDTO;
 import jakarta.persistence.*;
 
 @Entity
@@ -13,7 +14,10 @@ public class Vehicle {
     private long kilometers;
     private String color;
     private String gear;
+    @Enumerated(EnumType.STRING)
     private Status status;
+    private String buyerId;
+    private String transactionId;
     @ManyToOne
     private Model model;
     @ManyToOne
@@ -21,7 +25,8 @@ public class Vehicle {
 
 
     public Vehicle(String VIN, Integer releaseYear, double price, String fuel, long kilometers,
-                   String color, String gear, Status status, Model model, Seller seller) {
+                   String color, String gear, Status status, String buyerId, String transactionId,
+                   Model model, Seller seller) {
         this.VIN = VIN;
         this.releaseYear = releaseYear;
         this.price = price;
@@ -30,6 +35,8 @@ public class Vehicle {
         this.color = color;
         this.gear = gear;
         this.status = status;
+        this.buyerId = buyerId;
+        this.transactionId = transactionId;
         this.model = model;
         this.seller = seller;
     }
@@ -37,11 +44,14 @@ public class Vehicle {
     public Vehicle() {
         this.VIN = "";
         this.releaseYear = 0;
+        this.price = 0;
         this.fuel = "";
         this.kilometers = 0;
         this.color = "";
         this.gear = "";
         this.status = Status.Available;
+        this.buyerId = "";
+        this.transactionId = "";
         this.model = new Model();
         this.seller = new Seller();
     }
@@ -84,6 +94,14 @@ public class Vehicle {
 
     public Status getStatus() { return status; }
 
+    public String getBuyerId() {
+        return buyerId;
+    }
+
+    public String getTransactionId() {
+        return transactionId;
+    }
+
     public void setModelId(Model model) {
         this.model = model;
     }
@@ -118,5 +136,13 @@ public class Vehicle {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public void setBuyerId(String buyerId) {
+        this.buyerId = buyerId;
+    }
+
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
     }
 }

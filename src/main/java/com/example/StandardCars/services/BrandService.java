@@ -28,4 +28,28 @@ public class BrandService {
         return brandRepository.findById(id).get();
     }
 
+    public Brand updateBrand(long id, BrandDTO brandDTO){
+        Brand brand = brandRepository.findById(id).get();
+
+        if(brand == null){ return null; }
+
+        brandDTO.setId(id);
+        brandRepository.save(new Brand(brandDTO.getId(), brandDTO.getName(), brandDTO.getCountry()));
+
+        return brand;
+    }
+
+    public Brand deleteBrand(long id) {
+
+        Brand brand = brandRepository.findById(id).get();
+
+        if(brand == null){
+            return null;
+        }
+
+        brandRepository.delete(brand);
+
+        return brand;
+    }
+
 }

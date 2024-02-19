@@ -36,6 +36,10 @@ public class Brand {
         this.models = new ArrayList<>();
     }
 
+    public Brand(String name){
+        this.name = name;
+    }
+
     public long getId() {
         return id;
     }

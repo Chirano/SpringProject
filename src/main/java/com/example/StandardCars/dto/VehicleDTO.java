@@ -1,6 +1,7 @@
 package com.example.StandardCars.dto;
 
 import com.example.StandardCars.Enums.Status;
+import com.example.StandardCars.model.Vehicle;
 import org.springframework.hateoas.RepresentationModel;
 
 public class VehicleDTO extends RepresentationModel<VehicleDTO> {
@@ -12,13 +13,15 @@ public class VehicleDTO extends RepresentationModel<VehicleDTO> {
     private String color;
     private String gear;
     private Status status;
+    private String buyerId;
+    private String transactionId;
     private String model;
     private String seller;
 
 
     public VehicleDTO(String VIN, Integer releaseYear, double price, String fuel, long kilometers,
-                      String color, String gear, Status status, String model, String seller) {
-
+                      String color, String gear, Status status, String buyerId, String transactionId,
+                      String model, String seller) {
         this.VIN = VIN;
         this.releaseYear = releaseYear;
         this.price = price;
@@ -27,6 +30,8 @@ public class VehicleDTO extends RepresentationModel<VehicleDTO> {
         this.color = color;
         this.gear = gear;
         this.status = status;
+        this.buyerId = buyerId;
+        this.transactionId = transactionId;
         this.model = model;
         this.seller = seller;
     }
@@ -34,6 +39,7 @@ public class VehicleDTO extends RepresentationModel<VehicleDTO> {
     public VehicleDTO() {
         this.VIN = "";
         this.releaseYear = 0;
+        this.price = 0;
         this.fuel = "";
         this.kilometers = 0;
         this.color = "";
@@ -41,6 +47,21 @@ public class VehicleDTO extends RepresentationModel<VehicleDTO> {
         this.status = Status.Available;
         this.model = "";
         this.seller = "";
+    }
+
+    public VehicleDTO(Vehicle vehicle){
+        this.VIN = vehicle.getVIN();
+        this.releaseYear = vehicle.getReleaseYear();
+        this.price = vehicle.getPrice();
+        this.fuel = vehicle.getFuel();
+        this.kilometers = vehicle.getKilometers();
+        this.color = vehicle.getColor();
+        this.gear = vehicle.getGear();
+        this.status = vehicle.getStatus();
+        this.buyerId = vehicle.getBuyerId();
+        this.transactionId = vehicle.getTransactionId();
+        this.model = vehicle.getModel().getName();
+        this.seller = vehicle.getSeller().getName();
     }
 
     public String getSeller() {
@@ -81,6 +102,14 @@ public class VehicleDTO extends RepresentationModel<VehicleDTO> {
 
     public Status getStatus() { return status; }
 
+    public String getBuyerId() {
+        return buyerId;
+    }
+
+    public String getTransactionId() {
+        return transactionId;
+    }
+
     public void setVIN(String VIN) {
         this.VIN = VIN;
     }
@@ -118,4 +147,12 @@ public class VehicleDTO extends RepresentationModel<VehicleDTO> {
     }
 
     public void setStatus(Status status) {  this.status = status; }
+
+    public void setBuyerId(String buyerId) {
+        this.buyerId = buyerId;
+    }
+
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
+    }
 }

@@ -33,6 +33,13 @@ public class Model {
 
     }
 
+    public Model(ModelDTO modelDTO){
+        this.id = modelDTO.id;
+        this.name = modelDTO.getName();
+        this.brand = new Brand(modelDTO.getBrand());
+        this.vehicles = new ArrayList<>();
+    }
+
 
     public long getId() {
         return id;

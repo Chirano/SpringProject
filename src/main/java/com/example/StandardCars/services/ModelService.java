@@ -1,5 +1,4 @@
 package com.example.StandardCars.services;
-
 import com.example.StandardCars.Repository.BrandRepository;
 import com.example.StandardCars.Repository.ModelRepository;
 import com.example.StandardCars.dto.BrandDTO;
@@ -34,6 +33,31 @@ public class ModelService {
 
     public Model getModel(long id){
         return modelRepository.findById(id).get();
+    }
+
+
+    public Model updateModel(long id, ModelDTO modelDTO){
+        Model model = modelRepository.findById(id).get();
+
+        if(model == null){ return null; }
+
+        modelDTO.setId(id);
+        modelRepository.save(new Model(modelDTO));
+
+        return model;
+    }
+
+    public Model deleteModel(long id) {
+
+        Model model = modelRepository.findById(id).get();
+
+        if(model == null){
+            return null;
+        }
+
+        modelRepository.delete(model);
+
+        return model;
     }
 
 }
