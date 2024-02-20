@@ -2,6 +2,7 @@ package com.example.StandardCars.controller;
 import com.example.StandardCars.Enums.Status;
 import com.example.StandardCars.dto.BrandDTO;
 import com.example.StandardCars.dto.ModelDTO;
+import com.example.StandardCars.dto.PurchaseVehicleDTO;
 import com.example.StandardCars.dto.VehicleDTO;
 import com.example.StandardCars.model.Brand;
 import com.example.StandardCars.model.Model;
@@ -75,6 +76,11 @@ public class VehicleController {
 
     @PostMapping(value = "/vehicle", consumes = "application/json", produces = "application/json")
     public ResponseEntity<VehicleDTO> addVehicle(@RequestBody VehicleDTO vehicleDTO) {
+        Model model = modelService.getModelByName(vehicleDTO.getModel());
+
+        if(model == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         if(vehicleDTO == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -84,7 +90,7 @@ public class VehicleController {
         VehicleDTO veDTO = new VehicleDTO(vehicle);
 
         veDTO.add(linkTo(methodOn(VehicleController.class).getVehicles()).withRel("all_vehicles"));
-        veDTO.add(linkTo(methodOn(VehicleController.class).getVehicle(vehicleDTO.getVIN())).withRel("vehicle_by_VIN"));
+        veDTO.add(linkTo(methodOn(VehicleController.class).getVehicle(vehicleDTO.getVIN())).withRel("vehicle_by_id"));
         veDTO.add(linkTo(methodOn(VehicleController.class).updateVehicle(vehicleDTO.getVIN(), veDTO)).withRel("update"));
         veDTO.add(linkTo(methodOn(VehicleController.class).deleteVehicle(vehicleDTO.getVIN())).withRel("delete"));
 
@@ -106,6 +112,7 @@ public class VehicleController {
         Vehicle vehicle = service.updateVehicle(VIN, vehicleDTO);
 
         VehicleDTO upVehicleDTO = new VehicleDTO(vehicle);
+        upVehicleDTO.add(linkTo(methodOn(VehicleController.class).updateVehicle(vehicleDTO.getVIN(), upVehicleDTO)).withRel("update"));
 
         return new ResponseEntity<>(upVehicleDTO, HttpStatus.OK);
     }
@@ -120,6 +127,7 @@ public class VehicleController {
         Vehicle vehicle = service.deleteVehicleByVIN(VIN);
 
         VehicleDTO vehicleDTO = new VehicleDTO(vehicle);
+        vehicleDTO.add(linkTo(methodOn(VehicleController.class).deleteVehicle(vehicleDTO.getVIN())).withRel("delete"));
 
         return new ResponseEntity<>(vehicleDTO, HttpStatus.OK);
     }
@@ -135,7 +143,7 @@ public class VehicleController {
         BrandDTO brandDTO1 = new BrandDTO(brand);
 
         brandDTO1.add(linkTo(methodOn(VehicleController.class).getBrands()).withRel("see_all_brands"));
-        brandDTO1.add(linkTo(methodOn(VehicleController.class).getBrand(brandDTO1.getId())).withRel("brand_by_VIN"));
+        brandDTO1.add(linkTo(methodOn(VehicleController.class).getBrand(brandDTO1.getId())).withRel("brand_by_id"));
         brandDTO1.add(linkTo(methodOn(VehicleController.class).updateBrand(brandDTO1.getId(), brandDTO)).withRel("update"));
         brandDTO1.add(linkTo(methodOn(VehicleController.class).deleteBrand(brandDTO1.getId())).withRel("delete"));
 
@@ -172,6 +180,7 @@ public class VehicleController {
         Brand brand = brandService.getBrand(id);
 
         BrandDTO brandDTO = new BrandDTO(brand);
+        brandDTO.add(linkTo(methodOn(VehicleController.class).getBrand(brandDTO.getId())).withSelfRel());
 
         return new ResponseEntity<>(brandDTO, HttpStatus.OK);
     }
@@ -190,6 +199,7 @@ public class VehicleController {
         Brand brand = brandService.updateBrand(id, brandDTO);
 
         BrandDTO updatedBrand = new BrandDTO(brand);
+        updatedBrand.add(linkTo(methodOn(VehicleController.class).updateBrand(updatedBrand.getId(), brandDTO)).withRel("update"));
 
         return new ResponseEntity<>(updatedBrand, HttpStatus.OK);
     }
@@ -204,12 +214,20 @@ public class VehicleController {
         Brand brand = brandService.deleteBrand(id);
 
         BrandDTO brandDTO = new BrandDTO(brand);
+        brandDTO.add(linkTo(methodOn(VehicleController.class).deleteBrand(brandDTO.getId())).withRel("delete"));
+
 
         return new ResponseEntity<>(brandDTO, HttpStatus.OK);
     }
 
     @PostMapping(value = "/model", consumes = "application/json")
     ResponseEntity<ModelDTO> addModel(@RequestBody ModelDTO modelDTO){
+        Brand brand = brandService.getBrandByName(modelDTO.getBrand());
+        if(brand == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            ///criar exception para especificar o que nao esta correto
+        }
+
         if(modelDTO == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -217,6 +235,11 @@ public class VehicleController {
         Model model = modelService.addModel(modelDTO);
 
         ModelDTO modelDTO1 = new ModelDTO(model);
+
+        modelDTO1.add(linkTo(methodOn(VehicleController.class).getModels()).withRel("see_all_models"));
+        modelDTO1.add(linkTo(methodOn(VehicleController.class).getModel(modelDTO1.getId())).withRel("model_by_id"));
+        modelDTO1.add(linkTo(methodOn(VehicleController.class).updateModel(modelDTO1.getId(), modelDTO1)).withRel("update"));
+        modelDTO1.add(linkTo(methodOn(VehicleController.class).deleteModel(modelDTO1.getId())).withRel("delete"));
 
         return new ResponseEntity<>(modelDTO1, HttpStatus.CREATED);
     }
@@ -250,6 +273,7 @@ public class VehicleController {
         Model model = modelService.getModel(id);
 
         ModelDTO modelDTO = new ModelDTO(model);
+        modelDTO.add(linkTo(methodOn(VehicleController.class).getModel(modelDTO.getId())).withRel("model_by_id"));
 
         return new ResponseEntity<>(modelDTO, HttpStatus.OK);
     }
@@ -268,6 +292,8 @@ public class VehicleController {
         Model model = modelService.updateModel(id, modelDTO);
 
         ModelDTO updatedModel = new ModelDTO(model);
+        modelDTO.add(linkTo(methodOn(VehicleController.class).updateModel(modelDTO.getId(), modelDTO)).withRel("update"));
+
 
         return new ResponseEntity<>(updatedModel, HttpStatus.OK);
     }
@@ -281,21 +307,21 @@ public class VehicleController {
         Model model = modelService.deleteModel(id);
 
         ModelDTO modelDTO = new ModelDTO(model);
+        modelDTO.add(linkTo(methodOn(VehicleController.class).deleteModel(modelDTO.getId())).withRel("delete"));
+
 
         return new ResponseEntity<>(modelDTO, HttpStatus.OK);
     }
 
     @PutMapping(value = "/vehicle/{VIN}/status/{status}", produces = "application/json")
     ResponseEntity<VehicleDTO> updateVehicleStatus(@PathVariable("VIN") String VIN,
-                                                   @PathVariable String status){
+                                                   @RequestBody String status){
        Vehicle vehicle = service.getVehicleByVIN(VIN);
 
        if(vehicle == null){
            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
        }
-
-       if(status == null)
-       {
+       if(status == null){
            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
        }
 
@@ -306,8 +332,48 @@ public class VehicleController {
        return new ResponseEntity<>(vehicleDTO, HttpStatus.OK);
     }
 
-    @GetMapping(value = "vehicles/{model}", produces = "application/json")
-    ResponseEntity<List<VehicleDTO>> getVehicleByModel(@PathVariable("model") String model){
+
+    @PatchMapping(value = "vehicle/{VIN}/buyer/{id}", produces = "application/json")
+    ResponseEntity<VehicleDTO> updateVehicleBuyer(@PathVariable("VIN") String VIN,
+                                                    @PathVariable String id)
+    {
+        Vehicle vehicle = service.getVehicleByVIN(VIN);
+
+        if(vehicle == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        Vehicle upVehicle = service.updateVehicleBuyer(VIN, id);
+        VehicleDTO vehicleDTO = new VehicleDTO(upVehicle);
+
+        return new ResponseEntity<>(vehicleDTO, HttpStatus.OK);
+    }
+
+
+    @PutMapping(value = "vehicle/{VIN}/purchase", produces = "application/json")
+    ResponseEntity<VehicleDTO> buyVehicle(@PathVariable("VIN") String VIN,
+                                          @RequestBody PurchaseVehicleDTO purDTO){
+        Vehicle vehicle = service.getVehicleByVIN(VIN);
+        if(vehicle == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        if(vehicle.getStatus() != Status.Available){
+             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        Vehicle upVehicle = service.buyVehicle(VIN, purDTO);
+        VehicleDTO vehicleDTO = new VehicleDTO(upVehicle);
+
+        return new ResponseEntity<>(vehicleDTO, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "vehicles/model/{model}", produces = "application/json")
+    ResponseEntity<List<VehicleDTO>> getVehicleByModel(@PathVariable("model") String modelName){
+        Model model = modelService.getModelByName(modelName);
+        if(model == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
         List<Vehicle> vehicles = service.getVehicleByModel(model);
 
         if (vehicles == null){
@@ -320,12 +386,11 @@ public class VehicleController {
             VehicleDTO vehicleDTO = new VehicleDTO(vehicle);
             vehicleDTOS.add(vehicleDTO);
         }
-
         return new ResponseEntity<>(vehicleDTOS, HttpStatus.OK);
     }
 
-    @GetMapping(value = "vehicle/seller/{id}", produces = "application/json")
-    ResponseEntity<List<VehicleDTO>> getVehicleByModel(@PathVariable("id") Long id){
+    @GetMapping(value = "vehicles/seller/{id}", produces = "application/json")
+    ResponseEntity<List<VehicleDTO>> getVehicleBySeller(@PathVariable("id") Long id){
         List<Vehicle> vehicles = service.getVehicleBySeller(id);
 
         if (vehicles == null){
@@ -342,4 +407,60 @@ public class VehicleController {
         return new ResponseEntity<>(vehicleDTOS, HttpStatus.OK);
     }
 
+    @GetMapping(value = "vehicles/sold", produces = "application/json")
+    ResponseEntity<List<VehicleDTO>> getSoldVehicles(){
+        List<Vehicle> vehicles = service.getVehiclesSold();
+
+        if(vehicles == null){
+            new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        List <VehicleDTO> vehicleDTOS = new ArrayList<>();
+
+        for(Vehicle vehicle : vehicles){
+            VehicleDTO vehicleDTO = new VehicleDTO(vehicle);
+            vehicleDTOS.add(vehicleDTO);
+        }
+
+        return new ResponseEntity<>(vehicleDTOS, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "vehicle/status/{status}", produces = "application/json")
+    ResponseEntity<List<VehicleDTO>> getVehicleByStatus(@PathVariable Status status){
+        if(status == null){
+            new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        List<Vehicle> vehicles = service.getVehicleByStatus(status);
+
+        if(vehicles == null){
+            new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        List <VehicleDTO> vehicleDTOS = new ArrayList<>();
+
+        for(Vehicle vehicle : vehicles){
+            VehicleDTO vehicleDTO = new VehicleDTO(vehicle);
+            vehicleDTOS.add(vehicleDTO);
+        }
+        return new ResponseEntity<>(vehicleDTOS, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "vehicle/buyer/{id}", produces = "application/json")
+    ResponseEntity<List<VehicleDTO>> getVehicleByBuyer(@PathVariable("id") String id){
+        List<Vehicle> vehicles = service.getVehicleByBuyer(id);
+
+        if(vehicles == null){
+            new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        List <VehicleDTO> vehicleDTOS = new ArrayList<>();
+
+        for(Vehicle vehicle : vehicles){
+            VehicleDTO vehicleDTO = new VehicleDTO(vehicle);
+            vehicleDTOS.add(vehicleDTO);
+        }
+
+        return new ResponseEntity<>(vehicleDTOS, HttpStatus.OK);
+    }
 }

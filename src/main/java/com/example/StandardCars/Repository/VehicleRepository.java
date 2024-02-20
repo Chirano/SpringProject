@@ -1,5 +1,6 @@
 package com.example.StandardCars.Repository;
 
+import com.example.StandardCars.Enums.Status;
 import com.example.StandardCars.model.Model;
 import com.example.StandardCars.model.Seller;
 import com.example.StandardCars.model.Vehicle;
@@ -12,5 +13,9 @@ public interface VehicleRepository extends JpaRepository<Vehicle, String> {
     List<Vehicle> findVehicleByModel(Model model);
 
     List<Vehicle> findVehicleBySeller(Seller seller);
+
+    List<Vehicle> findVehicleByStatus(Status status);
+
+    List<Vehicle> findVehicleByBuyerId(String id);
 
 }

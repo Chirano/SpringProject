@@ -5,6 +5,7 @@ import com.example.StandardCars.dto.BrandDTO;
 import com.example.StandardCars.dto.ModelDTO;
 import com.example.StandardCars.model.Brand;
 import com.example.StandardCars.model.Model;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,7 @@ public class ModelService {
     @Autowired
     BrandRepository brandRepository;
 
+    @Transactional
     public Model addModel(ModelDTO modelDTO){
         Brand brand = brandRepository.findBrandByName(modelDTO.getBrand());
 
@@ -36,6 +38,7 @@ public class ModelService {
     }
 
 
+    @Transactional
     public Model updateModel(long id, ModelDTO modelDTO){
         Model model = modelRepository.findById(id).get();
 
@@ -57,6 +60,12 @@ public class ModelService {
 
         modelRepository.delete(model);
 
+        return model;
+    }
+
+    @Transactional
+    public Model getModelByName(String name){
+        Model model = modelRepository.findModelByName(name);
         return model;
     }
 

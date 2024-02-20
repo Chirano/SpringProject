@@ -52,4 +52,12 @@ public class BrandService {
         return brand;
     }
 
+    public Brand getBrandByName(String name){
+        Brand brand = brandRepository.findBrandByName(name);
+        if(brand == null){
+            return null;
+        }
+        return brand;
+    }
+
 }

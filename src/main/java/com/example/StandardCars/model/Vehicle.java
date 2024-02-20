@@ -2,6 +2,7 @@ package com.example.StandardCars.model;
 import com.example.StandardCars.Enums.Status;
 import com.example.StandardCars.dto.VehicleDTO;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class Vehicle {
@@ -18,8 +19,10 @@ public class Vehicle {
     private Status status;
     private String buyerId;
     private String transactionId;
+    @NotNull
     @ManyToOne
     private Model model;
+    @NotNull
     @ManyToOne
     private Seller seller;
 
