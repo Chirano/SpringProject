@@ -12,28 +12,27 @@ public class Brand {
     private long id;
     private String name;
     private String country;
-    @OneToMany
-    private List<Model> models;
+
 
     public Brand(long id, String name, String country) {
         this.id = id;
         this.name = name;
         this.country = country;
-        this.models = new ArrayList<>();
+        // this.models = new ArrayList<>();
     }
 
     public Brand() {
         this.id = 0;
         this.name = "";
         this.country = "";
-        this.models = new ArrayList<>();
+       // this.models = new ArrayList<>();
     }
 
     public Brand(BrandDTO brandDTO){
         this.id = brandDTO.getId();
         this.name = brandDTO.getName();
         this.country = brandDTO.getCountry();
-        this.models = new ArrayList<>();
+      //  this.models = new ArrayList<>();
     }
 
     public Brand(String name){
@@ -51,7 +50,7 @@ public class Brand {
     public String getCountry() {
         return country;
     }
-    public List<Model> getModels(){return models;}
+   // public List<Model> getModels(){return models;}
 
     public void setName(String name) {
         this.name = name;

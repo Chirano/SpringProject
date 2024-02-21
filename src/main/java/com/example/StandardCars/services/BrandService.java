@@ -4,6 +4,9 @@ import com.example.StandardCars.Repository.BrandRepository;
 import com.example.StandardCars.dto.BrandDTO;
 import com.example.StandardCars.model.Brand;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,8 +23,8 @@ public class BrandService {
         return brand;
     }
 
-    public List<Brand> getBrands(){
-        return brandRepository.findAll();
+    public Page<BrandDTO> getBrands(int page, int size, String sort){
+        return brandRepository.findAll(PageRequest.of(page,size, Sort.by(sort))).map(BrandDTO::toBrandDTO);
     }
 
     public Brand getBrand(long id){

@@ -3,8 +3,12 @@ import com.example.StandardCars.Enums.Status;
 import com.example.StandardCars.dto.VehicleDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
+@Getter
+@Setter
 public class Vehicle {
 
     @Id
@@ -57,95 +61,5 @@ public class Vehicle {
         this.transactionId = "";
         this.model = new Model();
         this.seller = new Seller();
-    }
-
-    public Seller getSeller() {
-        return seller;
-    }
-
-    public String getVIN() {
-        return VIN;
-    }
-
-    public Model getModel() {
-        return model;
-    }
-
-    public int getReleaseYear() {
-        return releaseYear;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public String getFuel() {
-        return fuel;
-    }
-
-    public long getKilometers() {
-        return kilometers;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public String getGear() {
-        return gear;
-    }
-
-    public Status getStatus() { return status; }
-
-    public String getBuyerId() {
-        return buyerId;
-    }
-
-    public String getTransactionId() {
-        return transactionId;
-    }
-
-    public void setModelId(Model model) {
-        this.model = model;
-    }
-
-    public void setReleaseYear(int year) {
-        this.releaseYear = year;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public void setFuel(String fuel) {
-        this.fuel = fuel;
-    }
-
-    public void setSeller(Seller seller) {
-        this.seller = seller;
-    }
-
-    public void setKilometers(long kilometers) {
-        this.kilometers = kilometers;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
-
-    public void setGear(String gear) {
-        this.gear = gear;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    public void setBuyerId(String buyerId) {
-        this.buyerId = buyerId;
-    }
-
-    public void setTransactionId(String transactionId) {
-        this.transactionId = transactionId;
     }
 }

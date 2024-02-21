@@ -11,25 +11,22 @@ public class Model {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     public long id;
-
     private String name;
     @ManyToOne
     private Brand brand;
-    @OneToMany
-    private List<Vehicle> vehicles;
 
     public Model(long id, String name, Brand brand) {
         this.id = id;
         this.name = name;
         this.brand = brand;
-        this.vehicles = new ArrayList<>();
+        //this.vehicles = new ArrayList<>();
     }
 
     public Model() {
         this.id = 0;
         this.name = "";
         this.brand = new Brand();
-        this.vehicles = new ArrayList<>();
+       // this.vehicles = new ArrayList<>();
 
     }
 
@@ -37,7 +34,7 @@ public class Model {
         this.id = modelDTO.id;
         this.name = modelDTO.getName();
         this.brand = new Brand(modelDTO.getBrand());
-        this.vehicles = new ArrayList<>();
+       // this.vehicles = new ArrayList<>();
     }
 
 
@@ -53,7 +50,7 @@ public class Model {
         return brand;
     }
 
-    public List<Vehicle> getVehicles(){ return vehicles;}
+    // public List<Vehicle> getVehicles(){ return vehicles;}
 
     public void setName(String name) {
         this.name = name;

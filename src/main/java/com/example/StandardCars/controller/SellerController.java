@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -37,7 +38,7 @@ public class SellerController {
             sellerDTOS.add(seDTO);
         }
 
-        Link link = linkTo(methodOn(VehicleController.class).getVehicles()).withSelfRel();
+        Link link = linkTo(methodOn(VehicleController.class).getVehicles(Optional.of(1),Optional.of(10))).withSelfRel();
         CollectionModel<SellerDTO> resp = CollectionModel.of(sellerDTOS, link);
 
         return new ResponseEntity<>(resp, HttpStatus.OK);

@@ -24,7 +24,6 @@ public class SellerService {
         return repository.findById(id).get();
     }
 
-
    public Seller addSeller(SellerDTO sellerDTO){
         Seller newSeller = repository.save(new Seller(sellerDTO.getId(), sellerDTO.getName(),
                 sellerDTO.getPhoneNumber(), sellerDTO.getEmail()));

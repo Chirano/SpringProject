@@ -30,6 +30,10 @@ public class ModelDTO extends RepresentationModel<ModelDTO> {
         this.brand = model.getBrand().getName();
     }
 
+    public static ModelDTO toModelDTO(Model model){
+        return new ModelDTO(model.getId(), model.getName(), model.getBrand().getName());
+    }
+
     public long getId() {
         return id;
     }

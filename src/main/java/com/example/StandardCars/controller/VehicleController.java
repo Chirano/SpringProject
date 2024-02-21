@@ -6,12 +6,18 @@ import com.example.StandardCars.dto.PurchaseVehicleDTO;
 import com.example.StandardCars.dto.VehicleDTO;
 import com.example.StandardCars.model.Brand;
 import com.example.StandardCars.model.Model;
+import com.example.StandardCars.model.Seller;
 import com.example.StandardCars.model.Vehicle;
 import com.example.StandardCars.services.BrandService;
 import com.example.StandardCars.services.ModelService;
+import com.example.StandardCars.services.SellerService;
 import com.example.StandardCars.services.VehicleService;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
@@ -21,6 +27,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.swing.text.html.HTML;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -38,26 +46,39 @@ public class VehicleController {
     @Autowired
     private ModelService modelService;
 
+    @Autowired
+    private SellerService sellerService;
+
 
     @GetMapping(value = "/vehicles", produces = "application/json")
-    public ResponseEntity<CollectionModel<VehicleDTO>> getVehicles() {
-        List<Vehicle> vehicles = service.getVehicles();
-        if (vehicles != null){
-        List<VehicleDTO> vehiclesDTO = new ArrayList<>();
+    public ResponseEntity<CollectionModel<VehicleDTO>> getVehicles(@RequestParam Optional<Integer> page,
+                                                   @RequestParam Optional<Integer> size) {
 
-        for(Vehicle vehicle : vehicles){
-            VehicleDTO vehicleDTO = new VehicleDTO(vehicle);
-            vehicleDTO.add(linkTo(methodOn(VehicleController.class).getVehicle(vehicleDTO.getVIN())).withSelfRel());
-            vehiclesDTO.add(vehicleDTO);
+        int _page = page.orElse(0);
+        int _size = size.orElse(10);
+        Page<VehicleDTO> vehicles = this.service.getVehicles(_page, _size);
+
+        if(vehicles == null){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
-        Link link = linkTo(methodOn(VehicleController.class).getVehicles()).withSelfRel();
-        CollectionModel<VehicleDTO> resp = CollectionModel.of(vehiclesDTO, link);
+        vehicles = vehicles.map((VehicleDTO v)-> v.add(linkTo(methodOn(VehicleController.class).getVehicle(v.getVIN())).withSelfRel()));
 
-        return new ResponseEntity<>(resp, HttpStatus.OK);
+        Link link = linkTo(methodOn(VehicleController.class).getVehicles(Optional.of(_page + 1), Optional.of( _size))).withSelfRel();
+        List<Link> links = new ArrayList<>();
+        links.add(link);
+
+        if(!vehicles.isLast()) {
+            Link _link = linkTo(methodOn(VehicleController.class).getVehicles(Optional.of(_page + 1), size)).withRel("next");
+            links.add(_link);
         }
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        if(!vehicles.isFirst()) {
+            Link _link = linkTo(methodOn(VehicleController.class).getVehicles(Optional.of(_page - 1), size)).withRel("previous");
+            links.add(_link);
+        }
+        return new ResponseEntity<>(CollectionModel.of(vehicles, links), HttpStatus.OK);
     }
+
 
 
     @GetMapping("/vehicle/{VIN}")
@@ -89,7 +110,7 @@ public class VehicleController {
 
         VehicleDTO veDTO = new VehicleDTO(vehicle);
 
-        veDTO.add(linkTo(methodOn(VehicleController.class).getVehicles()).withRel("all_vehicles"));
+        veDTO.add(linkTo(methodOn(VehicleController.class).getVehicles(Optional.of(1),Optional.of(10))).withRel("all_vehicles"));
         veDTO.add(linkTo(methodOn(VehicleController.class).getVehicle(vehicleDTO.getVIN())).withRel("vehicle_by_id"));
         veDTO.add(linkTo(methodOn(VehicleController.class).updateVehicle(vehicleDTO.getVIN(), veDTO)).withRel("update"));
         veDTO.add(linkTo(methodOn(VehicleController.class).deleteVehicle(vehicleDTO.getVIN())).withRel("delete"));
@@ -132,6 +153,7 @@ public class VehicleController {
         return new ResponseEntity<>(vehicleDTO, HttpStatus.OK);
     }
 
+
     @PostMapping(value = "/brand", consumes = "application/json")
     ResponseEntity<BrandDTO> addBrand(@RequestBody BrandDTO brandDTO){
         if(brandDTO == null){
@@ -142,7 +164,7 @@ public class VehicleController {
 
         BrandDTO brandDTO1 = new BrandDTO(brand);
 
-        brandDTO1.add(linkTo(methodOn(VehicleController.class).getBrands()).withRel("see_all_brands"));
+        brandDTO1.add(linkTo(methodOn(VehicleController.class).getBrands(Optional.of(1),Optional.of(10),Optional.of("name"))).withRel("see_all_brands"));
         brandDTO1.add(linkTo(methodOn(VehicleController.class).getBrand(brandDTO1.getId())).withRel("brand_by_id"));
         brandDTO1.add(linkTo(methodOn(VehicleController.class).updateBrand(brandDTO1.getId(), brandDTO)).withRel("update"));
         brandDTO1.add(linkTo(methodOn(VehicleController.class).deleteBrand(brandDTO1.getId())).withRel("delete"));
@@ -151,24 +173,36 @@ public class VehicleController {
         return new ResponseEntity<>(brandDTO1, HttpStatus.CREATED);
     }
 
+
     @GetMapping(value = "/brands", produces = "application/json")
-    ResponseEntity<CollectionModel<BrandDTO>> getBrands(){
-        List<Brand> brands = brandService.getBrands();
-        if (brands != null){
-            List<BrandDTO> brandsDTO = new ArrayList<>();
+    ResponseEntity<CollectionModel<BrandDTO>> getBrands(@RequestParam(name = "page") Optional<Integer> page,
+                                                        @RequestParam(name="size") Optional<Integer> size,
+                                                        @RequestParam(name="sort")  Optional<String> sort){
+        int _page =page.orElse(0);
+        int _size =size.orElse(10);
+        String _sort = sort.orElse("name");
 
-            for(Brand brand : brands){
-                BrandDTO brandDTO = new BrandDTO(brand);
-                brandDTO.add(linkTo(methodOn(VehicleController.class).getBrand(brandDTO.getId())).withSelfRel());
-                brandsDTO.add(brandDTO);
-            }
-
-            Link link = linkTo(methodOn(VehicleController.class).getBrands()).withSelfRel();
-            CollectionModel<BrandDTO> resp = CollectionModel.of(brandsDTO, link);
-
-            return new ResponseEntity<>(resp, HttpStatus.OK);
+        Page<BrandDTO> brands = brandService.getBrands(_page, _size, _sort);
+        if(brands == null){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+
+        brands = brands.map((BrandDTO b) -> b.add(linkTo(methodOn(VehicleController.class).getBrand(b.getId())).withSelfRel()));
+
+        Link link = linkTo(methodOn(VehicleController.class).getVehicles(Optional.of(1),Optional.of(10))).withSelfRel();
+        List<Link> links = new ArrayList<>();
+        links.add(link);
+
+        if(!brands.isLast()) {
+            Link _link = linkTo(methodOn(VehicleController.class).getBrands(Optional.of(_page + 1), Optional.of(_size),Optional.of(_sort))).withRel("next");
+            links.add(_link);
+        }
+        if(!brands.isFirst()) {
+            Link _link = linkTo(methodOn(VehicleController.class).getBrands(Optional.of(_page - 1), Optional.of(_size),Optional.of(_sort))).withRel("previous");
+            links.add(_link);
+        }
+        return new ResponseEntity<>(CollectionModel.of(brands, links), HttpStatus.OK);
     }
 
     @GetMapping(value = "brand/{id}", produces = "application/json")
@@ -236,7 +270,7 @@ public class VehicleController {
 
         ModelDTO modelDTO1 = new ModelDTO(model);
 
-        modelDTO1.add(linkTo(methodOn(VehicleController.class).getModels()).withRel("see_all_models"));
+        modelDTO1.add(linkTo(methodOn(VehicleController.class).getModels(Optional.of(0), Optional.of(10),Optional.of("name"))).withRel("see_all_models"));
         modelDTO1.add(linkTo(methodOn(VehicleController.class).getModel(modelDTO1.getId())).withRel("model_by_id"));
         modelDTO1.add(linkTo(methodOn(VehicleController.class).updateModel(modelDTO1.getId(), modelDTO1)).withRel("update"));
         modelDTO1.add(linkTo(methodOn(VehicleController.class).deleteModel(modelDTO1.getId())).withRel("delete"));
@@ -245,24 +279,34 @@ public class VehicleController {
     }
 
     @GetMapping(value = "/models", produces = "application/json")
-    ResponseEntity<CollectionModel<ModelDTO>> getModels(){
-        List<Model> models = modelService.getModels();
+    ResponseEntity<CollectionModel<ModelDTO>> getModels(@RequestParam(name = "page") Optional<Integer> page,
+                                                        @RequestParam(name="size") Optional<Integer> size,
+                                                        @RequestParam(name="sort")  Optional<String> sort){
 
-        if (models != null){
-            List<ModelDTO> modelDTOS = new ArrayList<>();
+        int _page=page.orElse(0);
+        int _size=size.orElse(10);
+        String _sort=sort.orElse("name");
 
-            for(Model model : models){
-                ModelDTO modelDTO = new ModelDTO(model);
-                modelDTO.add(linkTo(methodOn(VehicleController.class).getModel(modelDTO.getId())).withSelfRel());
-                modelDTOS.add(modelDTO);
-            }
-
-            Link link = linkTo(methodOn(VehicleController.class).getModels()).withSelfRel();
-            CollectionModel<ModelDTO> resp = CollectionModel.of(modelDTOS, link);
-
-            return new ResponseEntity<>(resp, HttpStatus.OK);
+        Page<ModelDTO> models = this.modelService.getModels(_page, _size, _sort);
+        if(models == null){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+        models = models.map((ModelDTO m)-> m.add(linkTo(methodOn(VehicleController.class).getModel(m.getId())).withSelfRel()));
+        Link link = linkTo(methodOn(VehicleController.class).getModels(Optional.of(_page),Optional.of(_size),Optional.of(_sort))).withSelfRel();
+        List<Link> links = new ArrayList<>();
+        links.add(link);
+        if(!models.isLast()) {
+            Link _link = linkTo(methodOn(VehicleController.class).getModels(Optional.of(_page + 1),
+                                                            Optional.of(_size),Optional.of(_sort))).withRel("next");
+            links.add(_link);
+        }
+        if(!models.isFirst()) {
+            Link _link = linkTo(methodOn(VehicleController.class).getModels(Optional.of(_page - 1),
+                                                            Optional.of(_size),Optional.of(_sort))).withRel("previous");
+            links.add(_link);
+        }
+        return new ResponseEntity<>(CollectionModel.of(models, links), HttpStatus.OK);
     }
 
     @GetMapping(value = "model/{id}", produces = "application/json")
@@ -367,100 +411,199 @@ public class VehicleController {
         return new ResponseEntity<>(vehicleDTO, HttpStatus.OK);
     }
 
+
     @GetMapping(value = "vehicles/model/{model}", produces = "application/json")
-    ResponseEntity<List<VehicleDTO>> getVehicleByModel(@PathVariable("model") String modelName){
+    ResponseEntity<CollectionModel<VehicleDTO>> getVehicleByModel(@PathVariable("model") String modelName,
+                                                       @RequestParam("page") Optional<Integer> page,
+                                                       @RequestParam("size") Optional<Integer> size){
+        int _page =page.orElse(0);
+        int _size =size.orElse(10);
+
+        Pageable pageable = PageRequest.of(_page, _size);
+
         Model model = modelService.getModelByName(modelName);
         if(model == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        List<Vehicle> vehicles = service.getVehicleByModel(model);
-
+        Page<VehicleDTO> vehicles = service.getVehicleByModel(model, pageable);
         if (vehicles == null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
-        List<VehicleDTO> vehicleDTOS = new ArrayList<>();
+        vehicles = vehicles.map((VehicleDTO v) -> v.add(linkTo(methodOn(VehicleController.class).getVehicle(v.getVIN())).withSelfRel()));
 
-        for(Vehicle vehicle : vehicles){
-            VehicleDTO vehicleDTO = new VehicleDTO(vehicle);
-            vehicleDTOS.add(vehicleDTO);
+        Link link = linkTo(methodOn(VehicleController.class).getVehicleByModel(model.getName(), Optional.of(_page),
+                                                                    Optional.of(_size))).withSelfRel();
+        List<Link> links = new ArrayList<>();
+        links.add(link);
+        if(!vehicles.isLast()) {
+            Link _link = linkTo(methodOn(VehicleController.class).getVehicleByModel(model.getName(), Optional.of(_page + 1), Optional.of(_size))).withRel("next");
+            links.add(_link);
         }
-        return new ResponseEntity<>(vehicleDTOS, HttpStatus.OK);
+        if(!vehicles.isFirst()) {
+            Link _link = linkTo(methodOn(VehicleController.class).getVehicleByModel(model.getName(), Optional.of(_page - 1), Optional.of(_size))).withRel("previous");
+            links.add(_link);
+        }
+        return new ResponseEntity<>(CollectionModel.of(vehicles, links), HttpStatus.OK);
     }
 
+
     @GetMapping(value = "vehicles/seller/{id}", produces = "application/json")
-    ResponseEntity<List<VehicleDTO>> getVehicleBySeller(@PathVariable("id") Long id){
-        List<Vehicle> vehicles = service.getVehicleBySeller(id);
+    ResponseEntity<CollectionModel<VehicleDTO>> getVehicleBySeller(@PathVariable("id") Long id,
+                                                        @RequestParam("page") Optional<Integer> page,
+                                                        @RequestParam("size") Optional<Integer> size){
+        int _page=page.orElse(0);
+        int _size=size.orElse(10);
 
+        Pageable pageable = PageRequest.of(_page, _size);
+        Seller seller = sellerService.getSellerById(id);
+        if(seller == null){
+            new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+
+        Page<VehicleDTO> vehicles = service.getVehicleBySeller(seller, pageable);
         if (vehicles == null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
-        List<VehicleDTO> vehicleDTOS = new ArrayList<>();
+        vehicles = vehicles.map((VehicleDTO v) -> v.add(linkTo(methodOn(VehicleController.class).getVehicle(v.getVIN())).withSelfRel()));
 
-        for(Vehicle vehicle : vehicles){
-            VehicleDTO vehicleDTO = new VehicleDTO(vehicle);
-            vehicleDTOS.add(vehicleDTO);
+        Link link = linkTo(methodOn(VehicleController.class).getVehicleBySeller(seller.getId(), Optional.of( _page),
+                                                            Optional.of(_size))).withSelfRel();
+
+        List<Link> links = new ArrayList<>();
+        links.add(link);
+        if(!vehicles.isLast()) {
+            Link _link = linkTo(methodOn(VehicleController.class).getVehicleBySeller(seller.getId(), Optional.of(_page + 1),
+                                                Optional.of(_size))).withRel("next");
+            links.add(_link);
+        }
+        if(!vehicles.isFirst()) {
+            Link _link = linkTo(methodOn(VehicleController.class).getVehicleBySeller(seller.getId(), Optional.of(_page - 1),
+                                                        Optional.of(_size))).withRel("previous");
+            links.add(_link);
         }
 
-        return new ResponseEntity<>(vehicleDTOS, HttpStatus.OK);
+        return new ResponseEntity<>(CollectionModel.of(vehicles, links), HttpStatus.OK);
     }
 
     @GetMapping(value = "vehicles/sold", produces = "application/json")
-    ResponseEntity<List<VehicleDTO>> getSoldVehicles(){
-        List<Vehicle> vehicles = service.getVehiclesSold();
+    ResponseEntity<CollectionModel<VehicleDTO>> getSoldVehicles(@RequestParam("page") Optional<Integer> page,
+                                                                @RequestParam("size") Optional<Integer> size){
+        int _page =page.orElse(0);
+        int _size =size.orElse(10);
+
+        Pageable pageable = PageRequest.of(_page, _size);
+
+        Page<VehicleDTO> vehicles = service.getVehiclesSold(pageable);
 
         if(vehicles == null){
             new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
-        List <VehicleDTO> vehicleDTOS = new ArrayList<>();
+        vehicles = vehicles.map((VehicleDTO v) -> v.add(linkTo(methodOn(VehicleController.class).getVehicle(v.getVIN())).withSelfRel()));
 
-        for(Vehicle vehicle : vehicles){
-            VehicleDTO vehicleDTO = new VehicleDTO(vehicle);
-            vehicleDTOS.add(vehicleDTO);
+        Link link = linkTo(methodOn(VehicleController.class).getSoldVehicles(Optional.of( _page),
+                Optional.of(_size))).withSelfRel();
+
+        List<Link> links = new ArrayList<>();
+        links.add(link);
+        if(!vehicles.isLast()) {
+            Link _link = linkTo(methodOn(VehicleController.class).getSoldVehicles(Optional.of(_page + 1),
+                    Optional.of(_size))).withRel("next");
+            links.add(_link);
+        }
+        if(!vehicles.isFirst()) {
+            Link _link = linkTo(methodOn(VehicleController.class).getSoldVehicles(Optional.of(_page - 1),
+                    Optional.of(_size))).withRel("previous");
+            links.add(_link);
         }
 
-        return new ResponseEntity<>(vehicleDTOS, HttpStatus.OK);
+        return new ResponseEntity<>(CollectionModel.of(vehicles, links), HttpStatus.OK);
     }
 
-    @GetMapping(value = "vehicle/status/{status}", produces = "application/json")
-    ResponseEntity<List<VehicleDTO>> getVehicleByStatus(@PathVariable Status status){
+    @GetMapping(value = "vehicles/status/{status}", produces = "application/json")
+    ResponseEntity<CollectionModel<VehicleDTO>> getVehicleByStatus(@PathVariable Status status,
+                                                        @RequestParam("page") Optional<Integer> page,
+                                                        @RequestParam("size") Optional<Integer> size ){
+        int _page =page.orElse(0);
+        int _size =size.orElse(10);
+
         if(status == null){
             new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        List<Vehicle> vehicles = service.getVehicleByStatus(status);
+        Pageable pageable = PageRequest.of(_page, _size);
+
+        Page<VehicleDTO> vehicles = service.getVehicleByStatus(status, pageable);
 
         if(vehicles == null){
             new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
-        List <VehicleDTO> vehicleDTOS = new ArrayList<>();
+        vehicles = vehicles.map((VehicleDTO v) -> v.add(linkTo(methodOn(VehicleController.class).getVehicle(v.getVIN())).withSelfRel()));
 
-        for(Vehicle vehicle : vehicles){
-            VehicleDTO vehicleDTO = new VehicleDTO(vehicle);
-            vehicleDTOS.add(vehicleDTO);
+
+        Link link = linkTo(methodOn(VehicleController.class).getVehicleByStatus(status, Optional.of(_page),
+                                                                    Optional.of(_size))).withSelfRel();
+
+        List<Link> links = new ArrayList<>();
+        links.add(link);
+        if(!vehicles.isLast()) {
+            Link _link = linkTo(methodOn(VehicleController.class).getSoldVehicles(Optional.of(_page + 1),
+                    Optional.of(_size))).withRel("next");
+            links.add(_link);
         }
-        return new ResponseEntity<>(vehicleDTOS, HttpStatus.OK);
+        if(!vehicles.isFirst()) {
+            Link _link = linkTo(methodOn(VehicleController.class).getSoldVehicles(Optional.of(_page - 1),
+                    Optional.of(_size))).withRel("previous");
+            links.add(_link);
+        }
+
+        return new ResponseEntity<>(CollectionModel.of(vehicles, links), HttpStatus.OK);
+
     }
 
-    @GetMapping(value = "vehicle/buyer/{id}", produces = "application/json")
-    ResponseEntity<List<VehicleDTO>> getVehicleByBuyer(@PathVariable("id") String id){
-        List<Vehicle> vehicles = service.getVehicleByBuyer(id);
+    @GetMapping(value = "vehicles/buyer/{id}", produces = "application/json")
+    ResponseEntity<CollectionModel<VehicleDTO>> getVehicleByBuyer(@PathVariable("id") String id,
+                                                        @RequestParam("page") Optional<Integer> page,
+                                                        @RequestParam("size") Optional<Integer> size ){
+            int _page =page.orElse(0);
+            int _size =size.orElse(10);
 
-        if(vehicles == null){
-            new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
+            if(id == null){
+                new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
 
-        List <VehicleDTO> vehicleDTOS = new ArrayList<>();
+            Pageable pageable = PageRequest.of(_page, _size);
 
-        for(Vehicle vehicle : vehicles){
-            VehicleDTO vehicleDTO = new VehicleDTO(vehicle);
-            vehicleDTOS.add(vehicleDTO);
-        }
+            Page<VehicleDTO> vehicles = service.getVehicleByBuyer(id, pageable);
 
-        return new ResponseEntity<>(vehicleDTOS, HttpStatus.OK);
+            if(vehicles == null){
+                new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+
+            vehicles = vehicles.map((VehicleDTO v) -> v.add(linkTo(methodOn(VehicleController.class).getVehicle(v.getVIN())).withSelfRel()));
+
+
+            Link link = linkTo(methodOn(VehicleController.class).getVehicleByBuyer(id, Optional.of(_page),
+                                                                    Optional.of(_size))).withSelfRel();
+
+            List<Link> links = new ArrayList<>();
+            links.add(link);
+            if(!vehicles.isLast()) {
+                Link _link = linkTo(methodOn(VehicleController.class).getVehicleByBuyer(id, Optional.of(_page + 1),
+                        Optional.of(_size))).withRel("next");
+                links.add(_link);
+            }
+            if(!vehicles.isFirst()) {
+                Link _link = linkTo(methodOn(VehicleController.class).getVehicleByBuyer(id, Optional.of(_page - 1),
+                        Optional.of(_size))).withRel("previous");
+                links.add(_link);
+            }
+
+            return new ResponseEntity<>(CollectionModel.of(vehicles, links), HttpStatus.OK);
     }
 }

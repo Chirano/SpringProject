@@ -4,6 +4,7 @@ import com.example.StandardCars.Enums.Status;
 import com.example.StandardCars.model.Vehicle;
 import org.springframework.hateoas.RepresentationModel;
 
+
 public class VehicleDTO extends RepresentationModel<VehicleDTO> {
     private String VIN;
     private Integer releaseYear;
@@ -62,6 +63,12 @@ public class VehicleDTO extends RepresentationModel<VehicleDTO> {
         this.transactionId = vehicle.getTransactionId();
         this.model = vehicle.getModel().getName();
         this.seller = vehicle.getSeller().getName();
+    }
+
+    public static VehicleDTO toVehicleDTO(Vehicle v){
+            return new VehicleDTO(v.getVIN(), v.getReleaseYear(), v.getPrice(), v.getFuel(), v.getKilometers(),
+                            v.getColor(), v.getGear(), v.getStatus(), v.getBuyerId(), v.getTransactionId(),
+                            v.getModel().getName(), v.getSeller().getName());
     }
 
     public String getSeller() {
@@ -155,4 +162,5 @@ public class VehicleDTO extends RepresentationModel<VehicleDTO> {
     public void setTransactionId(String transactionId) {
         this.transactionId = transactionId;
     }
+
 }

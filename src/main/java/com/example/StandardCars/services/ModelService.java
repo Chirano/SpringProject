@@ -7,6 +7,9 @@ import com.example.StandardCars.model.Brand;
 import com.example.StandardCars.model.Model;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,8 +32,8 @@ public class ModelService {
         return model;
     }
 
-    public List<Model> getModels(){
-        return modelRepository.findAll();
+    public Page<ModelDTO> getModels(int page, int size, String sort){
+        return modelRepository.findAll(PageRequest.of(page, size, Sort.by(sort))).map(ModelDTO::toModelDTO);
     }
 
     public Model getModel(long id){

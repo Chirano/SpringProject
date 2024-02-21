@@ -19,17 +19,12 @@ public class Seller {
 
     private String phoneNumber;
 
-
-    @OneToMany
-    private List<Vehicle> vehicles;
-
-
     public Seller(long id, String name, String email, String phoneNumber) {
         Id = id;
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
-        this.vehicles = new ArrayList<>();
+        //this.vehicles = new ArrayList<>();
     }
 
 
@@ -38,7 +33,7 @@ public class Seller {
         this.name = " ";
         this.email = " ";
         this.phoneNumber = " ";
-        this.vehicles = new ArrayList<>();
+       // this.vehicles = new ArrayList<>();
     }
 
     public Seller(SellerDTO sellerDTO){
@@ -46,7 +41,7 @@ public class Seller {
         this.name = sellerDTO.getName();
         this.email = sellerDTO.getEmail();
         this.phoneNumber = sellerDTO.getPhoneNumber();
-        this.vehicles = new ArrayList<>();
+       // this.vehicles = new ArrayList<>();
     }
 
     public long getId() {  return Id;   }
@@ -67,7 +62,7 @@ public class Seller {
     }
 
 
-    public List<Vehicle> getVehicles() { return this.vehicles; }
+   // public List<Vehicle> getVehicles() { return this.vehicles; }
 
 
     public void setName(String name) {

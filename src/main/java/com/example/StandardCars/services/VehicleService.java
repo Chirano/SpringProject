@@ -11,6 +11,10 @@ import com.example.StandardCars.model.Seller;
 import com.example.StandardCars.model.Vehicle;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -33,12 +37,14 @@ public class VehicleService {
         return this.vehicleRepository.findById(VIN).orElseThrow(() -> new NoSuchElementException("Vehicle not found"));
     }
 
-    public List<Vehicle> getVehicles() {
-        return this.vehicleRepository.findAll();
+    public Page<VehicleDTO> getVehicles(int page, int size)
+    {
+        return this.vehicleRepository.findAll(PageRequest.of(page,size)).map(VehicleDTO::toVehicleDTO);
     }
 
-    public List<Vehicle> getVehicleByModel(Model model){
-        return this.vehicleRepository.findVehicleByModel(model);
+    @Transactional
+    public Page<VehicleDTO> getVehicleByModel(Model model, Pageable pageable){
+        return this.vehicleRepository.findVehicleByModel(model, pageable).map(VehicleDTO::toVehicleDTO);
     }
 
     @Transactional
@@ -125,44 +131,24 @@ public class VehicleService {
 
 
     @Transactional
-    public List<Vehicle> getVehicleByModel(String modelName){
-        Model model =  modelRepository.findModelByName(modelName);
-        if(model == null){
-            return null;
-        }
+    public Page<VehicleDTO> getVehicleBySeller(Seller seller, Pageable pageable){
+        return this.vehicleRepository.findVehicleBySeller(seller, pageable).map(VehicleDTO::toVehicleDTO);
 
-        List<Vehicle> vehicles = vehicleRepository.findVehicleByModel(model);
-
-        return vehicles;
-    }
-    @Transactional
-    public List<Vehicle> getVehicleBySeller(long id){
-        Seller seller =  sellerRepository.findById(id).orElse(null);
-
-        List<Vehicle> vehicles = vehicleRepository.findVehicleBySeller(seller);
-
-        return vehicles;
     }
 
     @Transactional
-    public List<Vehicle> getVehicleByStatus(Status status){
-        List<Vehicle> vehicles = vehicleRepository.findVehicleByStatus(status);
-
-        return vehicles;
-    }
-    @Transactional
-    public List<Vehicle> getVehiclesSold(){
-        List<Vehicle> vehicles = vehicleRepository.findVehicleByStatus(Status.Sold);
-        return vehicles;
+    public Page<VehicleDTO> getVehicleByStatus(Status status, Pageable pageable){
+        return vehicleRepository.findVehicleByStatus(status, pageable).map(VehicleDTO::toVehicleDTO);
     }
 
     @Transactional
-    public List <Vehicle> getVehicleByBuyer(String id){
-        List<Vehicle> vehicles = vehicleRepository.findVehicleByBuyerId(id);
+    public Page<VehicleDTO> getVehiclesSold(Pageable pageable){
+        return vehicleRepository.findVehicleByStatus(Status.Sold, pageable).map(VehicleDTO::toVehicleDTO);
+    }
 
-        if(vehicles == null) {return  null; }
-
-        return vehicles;
+    @Transactional
+    public Page <VehicleDTO> getVehicleByBuyer(String id, Pageable pageable){
+        return vehicleRepository.findVehicleByBuyerId(id, pageable).map(VehicleDTO::toVehicleDTO);
     }
 
 

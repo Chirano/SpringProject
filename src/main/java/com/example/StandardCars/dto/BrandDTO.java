@@ -39,6 +39,10 @@ public class BrandDTO extends RepresentationModel<BrandDTO> {
         this.models = new ArrayList<>();
     }
 
+    public static BrandDTO toBrandDTO(Brand brand){
+        return new BrandDTO(brand.getId(), brand.getName(), brand.getCountry());
+    }
+
     public long getId() {
         return id;
     }
