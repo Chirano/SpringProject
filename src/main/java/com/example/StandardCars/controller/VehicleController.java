@@ -52,7 +52,7 @@ public class VehicleController {
 
     @GetMapping(value = "/vehicles", produces = "application/json")
     public ResponseEntity<CollectionModel<VehicleDTO>> getVehicles(@RequestParam Optional<Integer> page,
-                                                   @RequestParam Optional<Integer> size) {
+                                                                    @RequestParam Optional<Integer> size) {
 
         int _page = page.orElse(0);
         int _size = size.orElse(10);
@@ -64,16 +64,16 @@ public class VehicleController {
 
         vehicles = vehicles.map((VehicleDTO v)-> v.add(linkTo(methodOn(VehicleController.class).getVehicle(v.getVIN())).withSelfRel()));
 
-        Link link = linkTo(methodOn(VehicleController.class).getVehicles(Optional.of(_page + 1), Optional.of( _size))).withSelfRel();
+        Link link = linkTo(methodOn(VehicleController.class).getVehicles(Optional.of(_page), Optional.of( _size))).withSelfRel();
         List<Link> links = new ArrayList<>();
         links.add(link);
 
         if(!vehicles.isLast()) {
-            Link _link = linkTo(methodOn(VehicleController.class).getVehicles(Optional.of(_page + 1), size)).withRel("next");
+            Link _link = linkTo(methodOn(VehicleController.class).getVehicles(Optional.of(_page + 1), Optional.of(_size))).withRel("next");
             links.add(_link);
         }
         if(!vehicles.isFirst()) {
-            Link _link = linkTo(methodOn(VehicleController.class).getVehicles(Optional.of(_page - 1), size)).withRel("previous");
+            Link _link = linkTo(methodOn(VehicleController.class).getVehicles(Optional.of(_page - 1), Optional.of(_size))).withRel("previous");
             links.add(_link);
         }
         return new ResponseEntity<>(CollectionModel.of(vehicles, links), HttpStatus.OK);
